@@ -48,19 +48,16 @@ class ExoPlayerService : Service() {
                 }
             }
             COMMAND_STOP -> {
-                Log.d("testtt","command Stop")
                 commandStop()
             }
             COMMAND_PLAY -> {
-                Log.d("testtt","command Play")
                 play()
             }
             COMMAND_PAUSE -> {
-                Log.d("testtt","command Pause")
                 pause()
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_NOT_STICKY
     }
 
     inner class LocalBinder : Binder() {
@@ -81,8 +78,8 @@ class ExoPlayerService : Service() {
         pause()
         mExoPlayer.release()
         stopForeground(true)
-        stopSelf()
         mServiceStarted = false
+        stopSelf()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

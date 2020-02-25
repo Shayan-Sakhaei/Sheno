@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 exoPlayerService.pause()
             } else {
                 if (!exoPlayerService.isServiceStarted()) startService()
-                setSelectedFileMediaInfo()
                 exoPlayerService.loadMedia(selectedFileUri)
                 exoPlayerService.play()
             }
@@ -107,6 +106,7 @@ class MainActivity : AppCompatActivity() {
         title = mediaMetadataRetriever.extractMetadata(
             MediaMetadataRetriever.METADATA_KEY_TITLE
         )
+        setSelectedFileMediaInfo()
     }
 
     private fun setSelectedFileMediaInfo() {
