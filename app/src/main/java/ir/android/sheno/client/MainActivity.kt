@@ -1,16 +1,24 @@
 package ir.android.sheno.client
 
+import android.R.attr.typeface
 import android.app.Activity
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.res.AssetManager
+import android.graphics.Typeface
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import ir.android.sheno.R
 import ir.android.sheno.service.ExoPlayerService
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var exoPlayerService: ExoPlayerService
     private var isBound: Boolean = false
-    private var selectedFileUri: Uri? = null
+    private var isSongSelected: Boolean = false
     private lateinit var artist: String
     private lateinit var title: String
 
@@ -41,19 +49,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btnPlayPause.setOnClickListener {
-            if (exoPlayerService.isPlaying()) {
-                exoPlayerService.pause()
-            } else {
-                if (!exoPlayerService.isServiceStarted()) startService()
-                setSelectedFileMediaInfo()
-                exoPlayerService.loadMedia(selectedFileUri)
-                exoPlayerService.play()
-            }
-        }
+        tvArtist.setTypeFace()
+        tvTitle.setTypeFace()
 
         btnSelectSong.setOnClickListener {
             pickFile()
+        }
+
+        lavPlayPause.setOnClickListener {
+            if (!isSongSelected) return@setOnClickListener
+            if (exoPlayerService.isPlaying()) {
+                lavPlayPause.setAnimation("lottie_pause_to_play.json")
+                lavPlayPause.playAnimation()
+                lavAudioWave.pauseAnimation()
+                exoPlayerService.pause()
+            } else {
+                if (!exoPlayerService.isServiceStarted()) {
+                    startService()
+                }
+                lavPlayPause.setAnimation("lottie_play_to_pause.json")
+                lavPlayPause.playAnimation()
+                lavAudioWave.playAnimation()
+                exoPlayerService.play()
+            }
         }
     }
 
@@ -88,9 +106,11 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 OPEN_DOCUMENT_REQUEST_CODE -> {
-                    selectedFileUri = intent?.data
-                    getSelectedFileMediaInfo(selectedFileUri)
-                    btnPlayPause.isEnabled = true
+                    exoPlayerService.loadMedia(intent?.data)
+                    getSelectedFileMediaInfo(intent?.data)
+                    intent?.data.let {
+                        isSongSelected = true
+                    }
                 }
             }
         }
@@ -107,6 +127,12 @@ class MainActivity : AppCompatActivity() {
         title = mediaMetadataRetriever.extractMetadata(
             MediaMetadataRetriever.METADATA_KEY_TITLE
         )
+        setSelectedFileMediaInfo()
+    }
+
+    private fun TextView.setTypeFace() {
+        val typeface = Typeface.createFromAsset(assets, "fonts/oswald_regular.ttf")
+        this.typeface = typeface
     }
 
     private fun setSelectedFileMediaInfo() {

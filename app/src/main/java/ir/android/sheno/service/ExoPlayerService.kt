@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
@@ -48,19 +50,16 @@ class ExoPlayerService : Service() {
                 }
             }
             COMMAND_STOP -> {
-                Log.d("testtt","command Stop")
                 commandStop()
             }
             COMMAND_PLAY -> {
-                Log.d("testtt","command Play")
                 play()
             }
             COMMAND_PAUSE -> {
-                Log.d("testtt","command Pause")
                 pause()
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_NOT_STICKY
     }
 
     inner class LocalBinder : Binder() {
@@ -81,8 +80,8 @@ class ExoPlayerService : Service() {
         pause()
         mExoPlayer.release()
         stopForeground(true)
-        stopSelf()
         mServiceStarted = false
+        stopSelf()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
