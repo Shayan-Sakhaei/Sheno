@@ -45,8 +45,9 @@ dependencies {
     //Material
     implementation 'com.google.android.material:material:1.1.0'
 
-    // ExoPlayer
+    //ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.11.1'
 
-
+    //Lottie
+    implementation 'com.airbnb.android:lottie:3.4.0'
 }
